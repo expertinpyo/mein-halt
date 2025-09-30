@@ -1,0 +1,22 @@
+<div>
+  <app-select-options
+    [locationOptions]="locationOptions$ | async"
+    (searchLocationOptions)="onSearchClicked($event)"
+    (searchDetailOutput)="onSearchDetail($event)"
+    >
+  </app-select-options>
+  <div>
+    @if (locationDetail$ | async; as details){
+      <label>
+        <input type="checkbox" [formControl]="autoSearch">
+        Auto Refresh Button
+      </label>
+    }
+    @else {
+      <p>No Data Found.</p>
+    }
+  </div>
+  <app-station-board
+    [departures]="locationDetail$ | async"
+  ></app-station-board>
+</div>

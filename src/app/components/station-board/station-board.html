@@ -1,0 +1,41 @@
+
+@if (currentTime$ | async; as now){
+  <div class="station-board">
+  <header>
+    <div class="current-time">Current Time : {{ now | date: 'yyyy-MM-dd HH:mm:ss'}}</div>
+  </header>
+  @if (departures && departures.length > 0){
+    <ul class="departure-list">
+      @for (departure of departures; track departure.id){
+        <li class="departure-item">
+          <div class="main-info">
+            <span class="name">{{ departure.name }}</span>
+            <span class="name">{{ departure.mode }}</span>
+            <span class="name">{{ departure.publicCd }}</span>
+            <span class="destination">{{ departure.destination }}</span>
+          </div>
+          <div class="time-info">
+            <div class="planned-time">
+              <span>Original</span>
+              <span>
+                {{departure.ttTime | date:'yyyy-MM-dd HH:mm:ss' }}
+              </span>
+            </div>
+            <div class="estimated-time">
+              <span>Estimated</span>
+              <span [ngClass]="{ 'delayed' : isDelayed(departure)}" >
+                {{departure.etTime | date:'yyyy-MM-dd HH:mm:ss'}}
+              </span>
+            </div>
+            <div class="remaining-time">
+              <span [ngClass]="getRemainingTimeClass(departure.etTime, now)" >
+                {{departure.etTime | remainingTime:now }}
+              </span>
+            </div>
+          </div>
+        </li>
+      }
+    </ul>
+    }
+  </div>
+}

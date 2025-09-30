@@ -1,0 +1,29 @@
+<div>
+  <input type="text" [formControl]="searchControl" placeholder="Search...">
+  @if (locationOptions && locationOptions.length > 0){
+    <ul class="item-list">
+    @for (location of locationOptions; track location.id){
+      <li (click)="onSearch(location)">
+        {{location.name}}
+        @switch (location.mode){
+          @case ('rail') {
+            <span>🚈</span>
+          }
+          @case ('bus') {
+            <span>🚌</span>
+          }
+          @case ('water') {
+            <span>🚢</span>
+          }
+          @default {
+            <span></span>
+          }
+        }
+      </li>
+    }
+    </ul> 
+  }
+  @else {
+    <div>There is no item.</div>
+  }
+</div>
