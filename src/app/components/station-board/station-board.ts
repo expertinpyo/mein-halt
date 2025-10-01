@@ -14,10 +14,12 @@ import { map, Observable, timer } from 'rxjs';
 export class StationBoard {
   currentTime$: Observable<Date> = timer(0, 1000).pipe(map(()=> new Date()));
 
-  @Input() departures: LocationDetail[] | null = [];
+  @Input() stationDetails: LocationDetail[] | null = [];
 
-  isDelayed(departure: LocationDetail): boolean {
-    return departure.ttTime !== departure.etTime
+  isDelayed(detail: LocationDetail): string {
+    if(detail.ttTime >= detail.etTime)
+      return 'ontime'
+    return 'delayed'
   }
 
   getRemainingTimeClass(etTime: string, now:Date): string{

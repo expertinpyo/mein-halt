@@ -2,34 +2,36 @@
 @if (currentTime$ | async; as now){
   <div class="station-board">
   <header>
-    <div class="current-time">Current Time : {{ now | date: 'yyyy-MM-dd HH:mm:ss'}}</div>
+    <div class="current-time">{{ now | date: 'yyyy-MM-dd HH:mm:ss'}}</div>
   </header>
-  @if (departures && departures.length > 0){
+  @if (stationDetails && stationDetails.length > 0){
     <ul class="departure-list">
-      @for (departure of departures; track departure.id){
+      @for (detail of stationDetails; track detail.id){
         <li class="departure-item">
           <div class="main-info">
-            <span class="name">{{ departure.name }}</span>
-            <span class="name">{{ departure.mode }}</span>
-            <span class="name">{{ departure.publicCd }}</span>
-            <span class="destination">{{ departure.destination }}</span>
+            <span class="name">{{ detail.name }}</span>
+            <span class="">{{ detail.mode }}</span>
+            @if (detail.mode === 'bus') {
+              <span class="">{{ detail.publicCd }}</span>
+            }
+            <span class="destination">Nach {{ detail.destination }}</span>
           </div>
           <div class="time-info">
             <div class="planned-time">
-              <span>Original</span>
+              <span>Planned</span>
               <span>
-                {{departure.ttTime | date:'yyyy-MM-dd HH:mm:ss' }}
+                {{detail.ttTime | date:'yyyy-MM-dd HH:mm:ss' }}
               </span>
             </div>
             <div class="estimated-time">
               <span>Estimated</span>
-              <span [ngClass]="{ 'delayed' : isDelayed(departure)}" >
-                {{departure.etTime | date:'yyyy-MM-dd HH:mm:ss'}}
+              <span [ngClass]="isDelayed(detail)" >
+                {{detail.etTime | date:'yyyy-MM-dd HH:mm:ss'}}
               </span>
             </div>
             <div class="remaining-time">
-              <span [ngClass]="getRemainingTimeClass(departure.etTime, now)" >
-                {{departure.etTime | remainingTime:now }}
+              <span [ngClass]="getRemainingTimeClass(detail.etTime, now)" >
+                {{detail.etTime | remainingTime:now }}
               </span>
             </div>
           </div>

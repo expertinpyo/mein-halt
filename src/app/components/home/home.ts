@@ -1,11 +1,12 @@
 import { Component, inject, Input, input, OnInit } from '@angular/core';
-import { SelectOptions } from '../select-options/select-options';
+import { SelectOptions, DisplayLocationOption } from '../select-options/select-options';
 import { StationBoard } from '../station-board/station-board';
 import { ApiService } from '@app/core/api.service';
 import { LocationOption, LocationDetail } from '@app/models/data.model';
-import { catchError, combineLatest, Observable, of, startWith, Subject, switchMap, tap, timer } from 'rxjs';
+import { BehaviorSubject, catchError, combineLatest, map, Observable, of, startWith, Subject, switchMap, tap, timer } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { FavoritesService } from '@app/core/favorites.service';
 
 @Component({
   selector: 'app-home',
@@ -15,18 +16,26 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 })
 export class Home implements OnInit{
   apiService = inject(ApiService);
+  favService = inject(FavoritesService);
 
   private searchLocatioTr = new Subject<string>();
   private searchDetailTr = new Subject<LocationOption>();
+
+  private favSubject = new BehaviorSubject<LocationOption[]>([]);
+  favorites$ = this.favSubject.asObservable(); // Read only Observable Object
   
   autoSearch = new FormControl(false);
 
   locationOptions$! : Observable<LocationOption[]>;
   locationDetail$! : Observable<LocationDetail[]>;
 
+  locationOptionsDisplay$! : Observable<DisplayLocationOption[]>;
+
   lastUpdated: Date | null = null;
 
   ngOnInit(): void {
+    this.loadFavorites();
+
     this.locationOptions$ = this.searchLocatioTr.pipe(
       startWith(''),
       switchMap(term => this.apiService.getLocationOptions(term).pipe(
@@ -35,6 +44,23 @@ export class Home implements OnInit{
         return of([])
       })
       ))
+    );
+
+    this.locationOptionsDisplay$ = combineLatest([
+      this.locationOptions$, 
+      this.favorites$
+    ]).pipe(
+      map(([opts, favs]) => {
+        const favItems = favs.map(fav => ({item: fav, isFav: true}))
+        const notFavItems = opts
+          .filter(opt=> !favs.some(fav => fav.stopPlaceRef === opt.stopPlaceRef))
+          .map(opt=> ({
+            item: opt,
+            isFav:false
+          }))
+        return [...favItems, ...notFavItems]
+        }
+      )
     );
 
     this.locationDetail$  = combineLatest([
@@ -59,7 +85,7 @@ export class Home implements OnInit{
     })
   }
 
-  onSearchClicked(str : string): void {
+  onSearchLocationOptions(str : string): void {
     console.log('Parent Recieved string : ', str);
     this.searchLocatioTr.next(str);
   }
@@ -67,5 +93,19 @@ export class Home implements OnInit{
   onSearchDetail(location : LocationOption): void {
     console.log('Parent Recieved Location : ', location.name);
     this.searchDetailTr.next(location);
+  }
+
+  onFavToggleClicked(location: LocationOption): void {
+    console.log('Fav button clicked');
+    if(this.favService.isFavorite(location.stopPlaceRef)) {
+      this.favService.removeFavorites(location.stopPlaceRef)
+    } else {
+      this.favService.addFavorites(location)
+    }
+    this.loadFavorites();
+  }
+
+  loadFavorites(): void{
+    this.favSubject.next(this.favService.getFavorites());
   }
 }

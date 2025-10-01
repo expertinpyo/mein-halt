@@ -5,6 +5,11 @@ import { LocationOption } from '@app/models/data.model';
 import { ApiService } from '@app/core/api.service';
 import { CommonModule } from '@angular/common';
 
+export interface DisplayLocationOption {
+  item : LocationOption;
+  isFav: boolean;
+}
+
 @Component({
   selector: 'app-select-options',
   imports: [ReactiveFormsModule, CommonModule ],
@@ -12,11 +17,25 @@ import { CommonModule } from '@angular/common';
   styleUrl: './select-options.scss'
 })
 export class SelectOptions implements OnInit, OnDestroy{
-  @Input() locationOptions: LocationOption[] | null = [];
-  @Output() searchLocationOptions = new EventEmitter<string>();
-  @Output() searchDetailOutput = new EventEmitter<LocationOption>();
+  // Location List by API 
+  @Input() locationOptionsDisply: DisplayLocationOption[] | null = [];
+
+  // Emit Location Options Search event to Parent component
+  @Output() locationOptionsSearch = new EventEmitter<string>();
+
+  // Emit Detail Search event to Parent component
+  @Output() detailSearch = new EventEmitter<LocationOption>();
+
+  // Emit toggle Favorite event to Parent component
+  @Output() toggleFavorite = new EventEmitter<LocationOption>();
   
+  // input value Form Control Value
   searchControl = new FormControl('');
+
+  // Selected Location Item 
+  selectedItem: LocationOption | null = null; 
+
+  // destoryer Object - Prevent Memory leaks
   private destory$ = new Subject<void> ();
 
   ngOnInit(): void {
@@ -27,14 +46,27 @@ export class SelectOptions implements OnInit, OnDestroy{
       takeUntil(this.destory$)
     ).subscribe(term=> {
       console.log('1. [CHILD]: Debounced term. Emitting to parent ->', term);
-      this.searchLocationOptions.emit(term || '')
+      this.locationOptionsSearch.emit(term || '')
     })
   }
 
-  onSearch(location : LocationOption): void {
-    console.log('On Search from Child Start : ', location)
-    this.searchDetailOutput.emit(location)
-  }  
+  onSearchClick(): void {
+    if(this.searchControl.value && this.selectedItem) {
+      console.log('Search Detail Informatin : ', this.selectedItem.name)
+      this.detailSearch.emit(this.selectedItem)
+    }
+  }
+
+  onItemSelect(location: LocationOption): void {
+    console.log('Item Clicked : ', location);
+    this.selectedItem = location
+    this.searchControl.setValue(location.name, { emitEvent: false})
+  }
+
+  toggleFav(location: LocationOption, event: MouseEvent): void {
+    event.stopPropagation();
+    this.toggleFavorite.emit(location);
+  }
   
   ngOnDestroy(): void {
     this.destory$.next();
