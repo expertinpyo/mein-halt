@@ -1,6 +1,6 @@
 import {Injectable, inject} from '@angular/core'
 import { HttpClient, HttpHeaders } from '@angular/common/http'
-import { from, map, Observable, of, switchMap, tap } from 'rxjs'
+import { catchError, from, map, Observable, of, switchMap, tap, throwError } from 'rxjs'
 import { environment } from '@env/environment'
 import { XMLParser } from 'fast-xml-parser'
 import { LocationOption, LocationDetail } from '@app/models/data.model'
@@ -143,40 +143,52 @@ export class ApiService {
       responseType: 'text'
     }).pipe(
       map(xmlResponse => {
-        try{
-          const parser = new XMLParser()
+        try {
+          const parser = new XMLParser();
           const jsonObj = parser.parse(xmlResponse);
           const result = jsonObj.OJP?.OJPResponse?.['siri:ServiceDelivery']?.OJPLocationInformationDelivery?.PlaceResult
-          if (!Array.isArray(result)) throw new Error('No Result')
-          const locationOptions : LocationOption[] = result.map((item, index) => {
-            const place = item.Place
-            console.log(place)
-            if(!place) throw new Error ('No Place Information')
-
-            const geoPosition = place.GeoPosition
-            const mode = place.Mode
-            const name = place.Name
-            const stopPlace = place.StopPlace
-            if(!geoPosition || !mode || !name || !stopPlace) throw new Error('No valid specific Info ');
-            
-            const location: LocationOption = {
-              id: index,
-              stopPlaceRef: stopPlace.StopPlaceRef,
-              name: name.Text,
-              lat: geoPosition['siri:Latitude'],
-              lot: geoPosition['siri:Longitude'],
-              mode: mode.PtMode
-            }
-            return location
-          })
-
-          return locationOptions;
-
-        } catch (e) {
-          console.log("Error While parsing XML to Json : ", e);
-          return []
+          if (!Array.isArray(result)) return [];
+          return result;
+        } catch (err) {
+          throw { type: 'ParsingError', originalError: err}
         }
+      }),
+      map((result: any[])=> {
+        try {
+          const locationOptions : LocationOption[] = result.map((item, index)=> {
+          const place = item.Place
+          if(!place) return null;
+
+          const geoPosition = place.GeoPosition
+          const mode = place.Mode.PtMode
+          const name = place.Name.Text
+          const stopPlaceRef = place.StopPlace.StopPlaceRef
+
+          if(!geoPosition || !mode || !name || !stopPlaceRef) return null;
+
+          const location : LocationOption = {
+            id: index,
+            stopPlaceRef: stopPlaceRef,
+            name: name,
+            lat: geoPosition['siri:Latitude'],
+            lot: geoPosition['siri:Longitude'],
+            mode: mode
+          }
+            return location
+          }).filter((location): location is LocationOption => location !== null)
+          return locationOptions
+        } catch (err) {
+          throw {type: 'ParsingError', originalError: err}
+        }
+      }),
+      catchError(err=>{
+        if(err.type === 'ParsingError') {
+          console.log("Error in the location Parsing : ", err)
+          return of([])
+        }
+        return throwError(()=> err);
       })
+      
     )
   }
 }

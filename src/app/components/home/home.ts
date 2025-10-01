@@ -29,7 +29,12 @@ export class Home implements OnInit{
   ngOnInit(): void {
     this.locationOptions$ = this.searchLocatioTr.pipe(
       startWith(''),
-      switchMap(term => this.apiService.getLocationOptions(term)),
+      switchMap(term => this.apiService.getLocationOptions(term).pipe(
+        catchError(err=> {
+        console.log("Error : ", err);
+        return of([])
+      })
+      ))
     );
 
     this.locationDetail$  = combineLatest([
@@ -48,7 +53,10 @@ export class Home implements OnInit{
       }
       
     )),
-    tap(()=> this.lastUpdated = new Date())
+    tap(()=> {
+      this.lastUpdated = new Date()
+      console.log('New Update Time : ', this.lastUpdated);
+    })
   }
 
   onSearchClicked(str : string): void {
