@@ -20,6 +20,7 @@ export class Home implements OnInit{
 
   private searchLocatioTr = new Subject<string>();
   private searchDetailTr = new Subject<LocationOption>();
+  private autoSearchTrigger = new Subject<boolean>();
 
   private favSubject = new BehaviorSubject<LocationOption[]>([]);
   favorites$ = this.favSubject.asObservable(); // Read only Observable Object
@@ -65,7 +66,7 @@ export class Home implements OnInit{
 
     this.locationDetail$  = combineLatest([
       this.searchDetailTr,
-      this.autoSearch.valueChanges.pipe(startWith(false))
+      this.autoSearchTrigger
     ]).pipe(
       switchMap(([item, isEnable])=>{
         if(isEnable){
@@ -93,6 +94,10 @@ export class Home implements OnInit{
   onSearchDetail(location : LocationOption): void {
     console.log('Parent Recieved Location : ', location.name);
     this.searchDetailTr.next(location);
+  }
+
+  onAutoSearchToggle(toggle: boolean): void {
+    this.autoSearchTrigger.next(toggle)
   }
 
   onFavToggleClicked(location: LocationOption): void {

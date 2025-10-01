@@ -3,6 +3,10 @@
   <div class="station-board">
   <header>
     <div class="current-time">{{ now | date: 'yyyy-MM-dd HH:mm:ss'}}</div>
+    <label>
+        <input type="checkbox" [formControl]="autoSearchControl">
+        Auto Refresh Button
+      </label>
   </header>
   @if (stationDetails && stationDetails.length > 0){
     <ul class="departure-list">
@@ -10,7 +14,14 @@
         <li class="departure-item">
           <div class="main-info">
             <span class="name">{{ detail.name }}</span>
-            <span class="">{{ detail.mode }}</span>
+            <span class="transport-icon">
+              @switch (detail.mode){
+                @case ('rail') {🚆}
+                @case ('bus') {🚍}
+                @case ('water') {🚢}
+                @case ('tram') {🚊}
+              }
+            </span>
             @if (detail.mode === 'bus') {
               <span class="">{{ detail.publicCd }}</span>
             }
