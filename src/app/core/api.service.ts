@@ -98,7 +98,8 @@ export class ApiService {
             return location
           })
 
-          return locationDetails.filter(item=>item.id < 2)
+          return locationDetails
+          // .filter(item=>item.id < 2)
         }
         catch (e) {
           console.log("Error While parsing XML to Json : ", e);
@@ -109,7 +110,7 @@ export class ApiService {
   }
 
 
-  getLocationOptions(location:string, limit:number = 5): Observable<any[]> {
+  getLocationOptions(location:string, limit:number = 10): Observable<any[]> {
     console.log("Initial : ", location)
     const trimmed = location.trim();
     

@@ -16,5 +16,6 @@
   </div> -->
   <app-station-board
     [stationDetails]="locationDetail$ | async"
+    (autoSearchToggle)="onAutoSearchToggle($event)"
   ></app-station-board>
 </div>

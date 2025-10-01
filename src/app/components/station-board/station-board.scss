@@ -91,6 +91,12 @@ header {
   
 }
 
+/* 교통수단 이모티콘 */
+.transport-icon {
+  font-size: 25px;
+}
+
+
 .remaining-time > span {
   /* 1. display 변경: 너비와 패딩을 가질 수 있도록 inline-block으로 설정합니다. */
   display: inline-block;

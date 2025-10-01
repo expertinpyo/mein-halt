@@ -1,20 +1,35 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { LocationDetail } from '@app/models/data.model';
 import { RemainingTimePipe } from '@app/pipes/remaining-time-pipe';
-import { map, Observable, timer } from 'rxjs';
+import { map, Observable, startWith, Subject, takeUntil, timer } from 'rxjs';
 
 
 @Component({
   selector: 'app-station-board',
-  imports: [CommonModule, RemainingTimePipe],
+  imports: [CommonModule, ReactiveFormsModule, RemainingTimePipe],
   templateUrl: './station-board.html',
   styleUrl: './station-board.scss'
 })
-export class StationBoard {
+export class StationBoard implements OnInit, OnDestroy{
   currentTime$: Observable<Date> = timer(0, 1000).pipe(map(()=> new Date()));
+  autoSearchControl = new FormControl(false);
 
   @Input() stationDetails: LocationDetail[] | null = [];
+  @Output() autoSearchToggle = new EventEmitter<boolean>();
+
+  private destroy$ = new Subject<void> ();
+
+  ngOnInit(): void {
+    this.autoSearchControl.valueChanges.pipe(
+      startWith(false),
+      takeUntil(this.destroy$)
+    ).subscribe(isEnable => {
+      this.autoSearchToggle.emit(isEnable ?? false);
+    })
+  }
+
 
   isDelayed(detail: LocationDetail): string {
     if(detail.ttTime >= detail.etTime)
@@ -28,5 +43,11 @@ export class StationBoard {
     if (diffInMinutes <= 0) return 'departed';
     if (diffInMinutes < 1) return 'imminent';
     return '';
+  }
+
+  
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }
