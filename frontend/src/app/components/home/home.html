@@ -1,0 +1,13 @@
+<div class="home-flex">
+  <app-select-options
+    [locationOptionsDisply]="locationOptionsDisplay$ | async"
+    (locationOptionsSearch)="onSearchLocationOptions($event)"
+    (detailSearch)="onSearchDetail($event)"
+    (toggleFavorite)="onFavToggleClicked($event)"
+    >
+  </app-select-options>
+  <app-station-board
+    [stationDetails]="locationDetail$ | async"
+    (autoSearchToggle)="onAutoSearchToggle($event)"
+  ></app-station-board>
+</div>

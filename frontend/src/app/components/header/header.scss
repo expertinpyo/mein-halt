@@ -1,0 +1,57 @@
+:root {
+    --sbb-red: #eb0000;
+    --header-border-color: #e0e0e0;
+    --logo-text-color: #202020;
+}
+
+body {
+    font-family: Helvetica, Arial, sans-serif;
+    margin: 0;
+    background-color: #f5f5f5;
+}
+
+
+.sbb-header {
+    background-color: white;
+    padding: 12px 24px;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+}
+
+.sbb-logo-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+}
+
+.logo-icon {
+    
+    height: 70px; /* 아이콘 높이 */
+}
+
+.sbb-logo-icon {
+    background-color: var(--sbb-red);
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sbb-logo-icon svg {
+    width: 45px;  /* 아이콘 너비 */
+    height: 18px; /* 아이콘 높이 */
+}
+
+.sbb-logo-text {
+    color: #202020;
+    font-size: 18px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+
+.sbb-logo-img {
+    width: 60px;
+    height: 30px;
+}
