@@ -27,6 +27,8 @@ backend/.tsbuildinfo
 backend/.env
 backend/.env.*    # dev, prod 등
 !backend/.env.sample   # 샘플만 커밋 허용
+backend/.env.development
+backend/.env.production
 
 # =====================================
 # IDE / Editor
