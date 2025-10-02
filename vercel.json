@@ -1,0 +1,8 @@
+{
+  "buildCommand": "cd frontend && npm ci && npm run build -- --configuration production",
+  "outputDirectory": "frontend/dist/<angular-project-name>/browser",
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "https://<your-render-service>.onrender.com/api/$1" },
+    { "source": "/(.*)", "destination": "/" }
+  ]
+}
