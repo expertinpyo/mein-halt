@@ -16,7 +16,7 @@ export class ApiService {
   getStationTable(location:LocationOption, limit:number=50) : Observable<any[]> {
     if(!location)
       return of([]);
-    console.log("Station Table Request !")
+    console.log("Station Table Request!")
 
     const stopPlaceRef = location.stopPlaceRef;
     
