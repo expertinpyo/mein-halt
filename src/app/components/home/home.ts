@@ -2,7 +2,7 @@ import { Component, inject, Input, input, OnInit } from '@angular/core';
 import { SelectOptions, DisplayLocationOption } from '../select-options/select-options';
 import { StationBoard } from '../station-board/station-board';
 import { ApiService } from '@app/core/api.service';
-import { LocationOption, LocationDetail } from '@app/models/data.model';
+import { LocationOption, LocationDetail, LocationDetailMap } from '@app/models/data.model';
 import { BehaviorSubject, catchError, combineLatest, map, Observable, of, startWith, Subject, switchMap, tap, timer } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -28,7 +28,7 @@ export class Home implements OnInit{
   autoSearch = new FormControl(false);
 
   locationOptions$! : Observable<LocationOption[]>;
-  locationDetail$! : Observable<LocationDetail[]>;
+  locationDetail$! : Observable<LocationDetailMap[]>;
 
   locationOptionsDisplay$! : Observable<DisplayLocationOption[]>;
 

@@ -1,9 +1,9 @@
 import {Injectable, inject} from '@angular/core'
-import { HttpClient, HttpHeaders } from '@angular/common/http'
+import { HttpClient, HttpParams } from '@angular/common/http'
 import { catchError, from, map, Observable, of, switchMap, tap, throwError } from 'rxjs'
 import { environment } from '@env/environment'
 import { XMLParser } from 'fast-xml-parser'
-import { LocationOption, LocationDetail } from '@app/models/data.model'
+import { LocationOption, LocationDetail, LocationDetailMap } from '@app/models/data.model'
 
 
 @Injectable({
@@ -11,56 +11,21 @@ import { LocationOption, LocationDetail } from '@app/models/data.model'
 })
 export class ApiService {
   private readonly BASE_URL = environment.apiUrl
-  private readonly TOKEN = environment.token 
   private http = inject(HttpClient)
 
-  getHeader = () => {
-    return new HttpHeaders({
-      "Content-Type": "application/xml",
-      "Authorization": `Bearer ${this.TOKEN}`,
-    });
-  }
-
-  getStationTable(location:LocationOption) : Observable<any[]> {
+  getStationTable(location:LocationOption, limit:number=50) : Observable<any[]> {
     if(!location)
       return of([]);
     console.log("Station Table Request !")
 
     const stopPlaceRef = location.stopPlaceRef;
+    
+    const params = new HttpParams()
+      .set('stopPlaceRef', stopPlaceRef)
+      .set('limit', limit)
 
-    const now = new Date().toISOString()
-    const xml = `<?xml version="1.0" encoding="utf-8"?>
-    <OJP xmlns="http://www.vdv.de/ojp" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.vdv.de/ojp" version="2.0">
-    <OJPRequest>
-        <siri:ServiceRequest>
-            <siri:ServiceRequestContext>
-                <siri:Language>de</siri:Language>
-            </siri:ServiceRequestContext>
-            <siri:RequestTimestamp>${now}</siri:RequestTimestamp>
-            <siri:RequestorRef>SKIPlus</siri:RequestorRef>
-            <OJPStopEventRequest>
-                <siri:RequestTimestamp>${now}</siri:RequestTimestamp>
-                <siri:MessageIdentifier>SER_1</siri:MessageIdentifier>
-                <Location>
-                    <PlaceRef>
-                        <siri:StopPointRef>${stopPlaceRef}</siri:StopPointRef>
-                    </PlaceRef>
-                    <DepArrTime>${now}</DepArrTime>
-                </Location>
-                <Params>
-                    <NumberOfResults>10</NumberOfResults>
-                    <StopEventType>arrival</StopEventType>
-                    <IncludePreviousCalls>true</IncludePreviousCalls>
-                    <IncludeOnwardCalls>true</IncludeOnwardCalls>
-                    <UseRealtimeData>explanatory</UseRealtimeData>
-                </Params>
-            </OJPStopEventRequest>
-        </siri:ServiceRequest>
-    </OJPRequest>
-</OJP>
-    `
-    return this.http.post(this.BASE_URL, xml, {
-      headers: this.getHeader(),
+    return this.http.get(this.BASE_URL+'/api/details', {
+      params: params,
       responseType: 'text'
     }).pipe(
       map(xmlResponse => {
@@ -69,9 +34,9 @@ export class ApiService {
           const jsonObj = parser.parse(xmlResponse);
           const result = jsonObj.OJP?.OJPResponse?.['siri:ServiceDelivery']?.OJPStopEventDelivery?.StopEventResult
           if (!Array.isArray(result)) throw new Error('No Result')
-          const locationDetails : LocationDetail[] = result.map((item, index) => {
+          const locationDetails : LocationDetail[] = result
+            .map((item, index) => {
             const stopEvent = item.StopEvent
-            console.log(stopEvent)
             if(!stopEvent) throw new Error ('No Place Information')
 
             const prevCall = stopEvent.PreviousCall
@@ -97,9 +62,31 @@ export class ApiService {
             }
             return location
           })
+          const map = new Map<string, LocationDetailMap>();
+          const keyOf = (d: LocationDetail) => {
+            return [d.name.trim(), d.mode.trim(), d.destination.trim(), d.publicCd].join('|')
+          }
 
-          return locationDetails
-          // .filter(item=>item.id < 2)
+          console.log(locationDetails)
+
+          for(const detail of locationDetails){
+            const key = keyOf(detail)
+            const group = map.get(key)
+            if(group) {
+              if(group.locationDetails.length < 2)
+                group.locationDetails.push(detail)
+            } else {
+              map.set(key, {
+                id:map.size,
+                name: detail.name,
+                mode: detail.mode,
+                destination: detail.destination,
+                publicCd: detail.publicCd,
+                locationDetails: [detail]
+              })
+            }
+          }
+          return Array.from(map.values())
         }
         catch (e) {
           console.log("Error While parsing XML to Json : ", e);
@@ -109,40 +96,17 @@ export class ApiService {
     )
   }
 
-
   getLocationOptions(location:string, limit:number = 10): Observable<any[]> {
-    console.log("Initial : ", location)
     const trimmed = location.trim();
     
     if(!trimmed)
       return of([]);
+    
+    const params = new HttpParams()
+      .set('location', location)
+      .set('limit', limit)
 
-    const now = new Date().toISOString()
-    const xml = `<?xml version="1.0" encoding="UTF-8"?>
-    <OJP xmlns="http://www.vdv.de/ojp" xmlns:siri="http://www.siri.org.uk/siri" version="2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vdv.de/ojp ../../../../Downloads/OJP-changes_for_v1.1%20(1)/OJP-changes_for_v1.1/OJP.xsd">
-      <OJPRequest>
-        <siri:ServiceRequest>
-        <siri:RequestTimestamp>${now}</siri:RequestTimestamp>
-        <siri:RequestorRef>myapp_test</siri:RequestorRef>
-        <OJPLocationInformationRequest>
-          <siri:RequestTimestamp>${now}</siri:RequestTimestamp>
-          <siri:MessageIdentifier>LIR-1a</siri:MessageIdentifier>
-          <InitialInput>
-            <Name>${location}</Name>
-          </InitialInput>
-          <Restrictions>
-              <Type>stop</Type>
-              <NumberOfResults>${limit}</NumberOfResults>
-          </Restrictions>
-        </OJPLocationInformationRequest>
-        </siri:ServiceRequest>
-      </OJPRequest>
-    </OJP>
-    `
-    return this.http.post(this.BASE_URL, xml, {
-      headers: this.getHeader(),
-      responseType: 'text'
-    }).pipe(
+    return this.http.get(this.BASE_URL + '/api/locations', {params: params, responseType: 'text'}).pipe(
       map(xmlResponse => {
         try {
           const parser = new XMLParser();

@@ -1,1 +1,72 @@
 /* You can add global styles to this file, and also import other style files */
+:root {
+  --color-bg: #ffffff;
+  --color-border: #ddd;
+  --color-text: #333;
+  --color-subtext: #555;
+  --color-placeholder: #888;
+
+  --color-primary: #007BBE;
+  --color-accent: #acaaaa;
+  --color-hover: #121111;
+  --color-disabled: #cccccc;
+  //--color-favorite-bg: #fffbe6;
+  --color-favorite-bg: #fffbe6;
+  --color-favorite-bg-hover: #fcf8e3;
+
+  --color-toggle: #007BBE;
+  --color-star: #ffc107;
+  --color-delayed: #e53935;
+  --color-ontime: #16c214;
+  --color-imminent: #00897b;
+  --color-departed: #757575;
+}
+
+/* Default Card Container */
+.card-container {
+  background-color: var(--color-bg);
+  border-radius: 1rem;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  margin: 2rem auto;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 1.5rem;
+}
+
+/* List default style */
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 60vh;        /* 화면 비율에 따른 스크롤 */
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* 스크롤바 디자인 (웹킷 브라우저 기준) */
+ul::-webkit-scrollbar {
+  width: 0.6rem;
+}
+ul::-webkit-scrollbar-thumb {
+  background-color: var(--color-border);
+  border-radius: 1rem;
+}
+ul::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+/* 공통 아이콘 */
+.transport-icon {
+  width: 1.5rem;
+  text-align: center;
+}
+
+/* input과 current-time 크기 통일 */
+.input-unified,
+.current-time {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+

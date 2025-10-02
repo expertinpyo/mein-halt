@@ -16,3 +16,12 @@ export interface LocationDetail {
   mode: string,
   destination: string
 }
+
+export interface LocationDetailMap {
+  id: number,
+  name: string,
+  publicCd: string,
+  mode: string,
+  destination: string,
+  locationDetails: Array<LocationDetail>
+}

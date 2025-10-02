@@ -6,14 +6,6 @@
     (toggleFavorite)="onFavToggleClicked($event)"
     >
   </app-select-options>
-  <!-- <div>
-    @if (locationDetail$ | async; as details){
-      <label>
-        <input type="checkbox" [formControl]="autoSearch">
-        Auto Refresh Button
-      </label>
-    }
-  </div> -->
   <app-station-board
     [stationDetails]="locationDetail$ | async"
     (autoSearchToggle)="onAutoSearchToggle($event)"

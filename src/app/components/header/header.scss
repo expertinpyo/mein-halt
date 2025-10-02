@@ -26,6 +26,11 @@ body {
     text-decoration: none;
 }
 
+.logo-icon {
+    
+    height: 70px; /* 아이콘 높이 */
+}
+
 .sbb-logo-icon {
     background-color: var(--sbb-red);
     padding: 8px;
@@ -47,6 +52,6 @@ body {
 }
 
 .sbb-logo-img {
-     width: 60px;
+    width: 60px;
     height: 30px;
 }
