@@ -67,8 +67,6 @@ export class ApiService {
             return [d.name.trim(), d.mode.trim(), d.destination.trim(), d.publicCd].join('|')
           }
 
-          console.log(locationDetails)
-
           for(const detail of locationDetails){
             const key = keyOf(detail)
             const group = map.get(key)
