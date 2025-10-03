@@ -141,24 +141,6 @@ http://localhost:4200
 
 ```
 
----
-
-## Key UX Patterns
-
-### 1) Prevent empty searches (toast)
-
-```ts
-onSearch() {
-  const q = this.searchControl.value?.trim();
-  if (!q) {
-    this.snackBar.open('Please enter a search term', 'OK', {
-      duration: 2000, verticalPosition: 'top'
-    });
-    return;
-  }
-  this.api.search(q).subscribe(/* ... */);
-}
-```
 
 ---
 
