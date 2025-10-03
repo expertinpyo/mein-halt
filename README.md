@@ -1,5 +1,8 @@
 # Mein Halt
 
+<img src="./frontend/src/assets/img/logo.png" width="300" height="300">
+
+
 > **Show the live timetable for your stop in Switzerland.**
 > Minimal Angular app to quickly see upcoming arrivals for a selected stop.
 <p align="left">
