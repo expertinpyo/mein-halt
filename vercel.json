@@ -1,7 +1,0 @@
-{
-  "buildCommand": "npm ci && npm run build -- --configuration production",
-  "outputDirectory": "dist/mein-halt/browser",
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/" }
-  ]
-}
