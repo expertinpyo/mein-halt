@@ -49,7 +49,11 @@ export class ApiService {
             const etTime = thisCall.CallAtStop.ServiceArrival.EstimatedTime ?? ttTime
             const publicCd = serviceDetail.PublicCode
             const mode = serviceDetail.Mode.PtMode
+            // const originRef = serviceDetail.OriginStopPointRef
+            const directionRef = serviceDetail['siri:DirectionRef']
             const destination = serviceDetail.DestinationText.Text
+
+            // console.log(serviceDetail, thisCall)
             
             const location: LocationDetail = {
               id: index,
@@ -58,13 +62,15 @@ export class ApiService {
               etTime: etTime,
               mode: mode,
               publicCd: publicCd,
+              originRef: '',
+              destinationRef: directionRef,
               destination: destination
             }
             return location
           })
           const map = new Map<string, LocationDetailMap>();
           const keyOf = (d: LocationDetail) => {
-            return [d.name.trim(), d.mode.trim(), d.destination.trim(), d.publicCd].join('|')
+            return [d.name.trim(), d.mode.trim(), d.destinationRef.trim(), d.publicCd].join('|')
           }
 
           for(const detail of locationDetails){

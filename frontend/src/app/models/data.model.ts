@@ -14,6 +14,8 @@ export interface LocationDetail {
   etTime: string,
   publicCd: string,
   mode: string,
+  originRef: string,
+  destinationRef: string,
   destination: string
 }
 
