@@ -9,45 +9,44 @@ import { Component } from '@angular/core';
 export class Header {
 
   onLogoClick(): void {
-    const userAgent = navigator.userAgent.toLocaleLowerCase()
-    
-    
-    const isAndroid = /android/.test(userAgent);
-    const isIOS = /iphone|ipad|ipod/.test(userAgent);
-    
-    
-    if(isAndroid){
-      window.location.href = 'sbbmobile://'
-      const storeUrl = encodeURIComponent('https://play.google.com/store/apps/details?id=ch.sbb.mobile.android.b2c')
-      const intent = `intent://#Intent;scheme=sbbmobile;package=ch.sbb.mobile.android.b2c;S.browser_fallback_url=${storeUrl};end`;
-      window.location.href = intent;
+    const ua = navigator.userAgent.toLowerCase();
+    const isAndroid = /android/.test(ua);
+    const isIOS = /iphone|ipad|ipod/.test(ua);
+
+    const ANDROID_STORE = 'https://play.google.com/store/apps/details?id=ch.sbb.mobile.android.b2c';
+    const IOS_STORE = 'https://apps.apple.com/ch/app/sbb-mobile/id294855237';
+
+    const openWithFallback = (appUrl: string, storeUrl: string) => {
+      let timer: any;
+
+      const cancel = () => {
+        if (timer) clearTimeout(timer);
+        window.removeEventListener('pagehide', cancel);
+        window.removeEventListener('blur', cancel);
+        window.removeEventListener('visibilitychange', onVis);
+      };
+      const onVis = () => {
+        if (document.hidden) cancel();
+      };
+
+      window.addEventListener('pagehide', cancel);      
+      window.addEventListener('blur', cancel);          
+      document.addEventListener('visibilitychange', onVis);
+
+      window.location.href = appUrl;
+
+      timer = setTimeout(() => {
+        window.location.href = storeUrl;
+      }, 1200);
+    };
+
+    if (isAndroid) {
+      openWithFallback('sbbmobile://', ANDROID_STORE);
       return;
     }
+
     if (isIOS) {
-      const appStoreUrl = 'https://apps.apple.com/ch/app/sbb-mobile/id294855237';
-
-      let fallbackTimer: any;
-
-      const cancelFallback = () => {
-        if (fallbackTimer) clearTimeout(fallbackTimer);
-        window.removeEventListener('pagehide', cancelFallback);
-        window.removeEventListener('blur', cancelFallback);
-        document.removeEventListener('visibilitychange', onVisChange);
-      };
-      const onVisChange = () => {
-        if (document.hidden) cancelFallback();
-      };
-
-      window.addEventListener('pagehide', cancelFallback);
-      window.addEventListener('blur', cancelFallback);
-      document.addEventListener('visibilitychange', onVisChange);
-
-      window.location.href = 'sbbmobile://';
-
-      fallbackTimer = setTimeout(() => {
-        window.location.href = appStoreUrl;
-      }, 1200);
-
+      openWithFallback('sbbmobile://', IOS_STORE);
       return;
     }
 
