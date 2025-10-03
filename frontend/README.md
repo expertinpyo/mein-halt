@@ -1,72 +1,195 @@
-# MeinHalt
+# Mein Halt
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.3.
+> **Show the live timetable for your stop in Switzerland.**
+> Minimal Angular app to quickly see upcoming arrivals for a selected stop.
+<p align="left">
 
-## Development server
+  <a href="#">
+    <img alt="Angular" src="https://img.shields.io/badge/Angular-20-DD0031?logo=angular&logoColor=white">
+  </a>
+  
+  <a href="#">
+    <img alt="Node" src="https://img.shields.io/badge/Node-%E2%89%A520-339933?logo=node.js&logoColor=white">
+  </a>
 
-To start a local development server, run:
+  <a href="#">
+    <img alt="Deploy" src="https://img.shields.io/badge/Deploy-Vercel/Render-000000?logo=vercel">
+  </a>
+  <a href="#license">
+    <img alt="License" src="https://img.shields.io/badge/License-MIT-blue.svg">
+  </a>
+</p>
+
+---
+
+## Application
+
+**Live :** https://mein-halt.vercel.app/
+
+
+---
+
+## Features
+
+* 🔎 Fast stop search with debounced queries
+* 🕒 Live arrivals (timetable view)
+* 📱 Clear UI; keyboard‑friendly desktop UX
+* 🔗 Deep link to **SBB Mobile** on phones; open **sbb.ch** on desktop
+* 💾 Favorite stops saving (localStorage)
+* 🚀 PWA‑ready (installable, offline fallback shell)
+
+## Tech Stack
+
+* **Angular** 20+ & **RxJS** 7+
+* **TypeScript** 5+
+* **Express** 
+* **Build**: Angular CLI
+* **CI/CD**: GitHub Actions → Vercel(front) or Render(backend)
+
+## Project Structure
+
+```
+mein-halt/
+├─ frontend/    # Angular 20 app (UI)
+│  ├─ src/
+│  │  ├─ app/
+│  │  │  ├─ components/
+│  │  │  │  ├─ header/
+│  │  │  │  ├─ home/
+│  │  │  │  ├─ select-options/
+│  │  │  │  └─ station-board/
+│  │  │  ├─ core/            # API clients and Mappers (XML to Json)
+│  │  │  ├─ models/          # DTOs & types
+│  │  │  └─ pipes/           
+│  │  ├─ assets/
+│  │  ├─ environments/
+│  │  └─ styles.scss
+│  ├─ docs/
+│  │  └─ screenshots/
+├─ backend/     # Express server (env/proxy wrapper)
+│  ├─ index.js
+│  └─ .env
+└─ README.md
+```
+
+---
+
+## Setting
+
+### Prerequisites
+
+- Node.js v20+
+- Auglar CLI globally : ``npm i -g @angular/cli``
+
+### Configuration (env)
+
+Refer to `backend/.env-sample` to set environment.
+
+``` bash
+PORT=           # Server Port Number
+CORS_ORIGIN=    # CORS setting
+UPSTREAM_BASE=  # API Request URL 
+API_KEY=        # API Secret key
+```
+
+
+`frontend/src/environments/environment.ts`
+
+```ts
+export const environment = {
+  production: true,
+  apiUrl: 'https://mein-halt.onrender.com',
+};
+```
+
+### Local Development
+
+#### 1) Backend (Exoress)
+
+``` bash
+# Navigate to the backend directory
+cd backend
+
+# Install NPM packages
+npm install
+
+# Start the backend server
+npm run dev # dev
+npm run start   # prod  
+
+```
+
+#### 2) Frontend (Angular)
 
 ```bash
+# Navigate to the frontend directory
+cd frontend 
+
+# Install NPM packages
+npm install
+
+# Start the frontend server
 ng serve
+
+# Enter the server
+# local
+http://localhost:4200
+
+
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+---
 
-## Code scaffolding
+## Key UX Patterns
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+### 1) Prevent empty searches (toast)
 
-```bash
-ng generate component component-name
+```ts
+onSearch() {
+  const q = this.searchControl.value?.trim();
+  if (!q) {
+    this.snackBar.open('Please enter a search term', 'OK', {
+      duration: 2000, verticalPosition: 'top'
+    });
+    return;
+  }
+  this.api.search(q).subscribe(/* ... */);
+}
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+---
 
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## API Notes
+All data is from  **``opentransportdata.swiss``**
 
 
-## API 
-
-- OJP
+- OJP (Open Journey Planner)
 https://opentransportdata.swiss/en/cookbook/routing-cookbook/open-journey-planner-ojp/
 
-- OJP:Location Information Request 2.0
+- OJP : Location Information Request 2.0
 https://opentransportdata.swiss/de/cookbook/routing-cookbook/open-journey-planner-ojp/ojplocationinformationrequest-2-0/
 
-- OJP: StopEventRequest 2.0
+- OJP : StopEventRequest 2.0
 https://opentransportdata.swiss/en/cookbook/routing-cookbook/open-journey-planner-ojp/ojpstopeventrequest-2-0/
+
+- To get API key
+https://api-manager.opentransportdata.swiss/
+
+
+
+* Typical response can be **XML**; parse with `fast-xml-parser` and map to DTOs.
+* Example mapping (pseudo):
+
+```ts
+const parsed = parser.parse(xml);
+const items = parsed?.OJPResponse?.StopEventResponse?.StopEvent || [];
+return items.map(mapToDeparture);
+```
+
+## License
+
+©MIT
+©Open Data-Plattform Mobilität Schweiz 2025 (Data)
+
+
 
