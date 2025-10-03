@@ -1,21 +1,32 @@
 /* 부모 컨테이너 스타일 */
 .home-flex {
-  /* 1. 이 컨테이너를 Grid 레이아웃으로 설정합니다. */
   display: grid;
-
-  /* 2. 자식 요소들 사이에 20px의 간격을 줍니다. */
   gap: 1rem;
-
-  /* (선택사항) 컨테이너의 전체 너비를 설정합니다. */
-  width: 100%;
-}
-
-
-/* --- 너비를 50% : 50% (절반씩)으로 나누고 싶을 때 --- */
-.home-flex {
-  /* 1fr 1fr;
-    - 사용 가능한 공간을 동일한 비율(1fr)을 가진 두 개의 열로 나눕니다.
-    - 'fr'은 'fraction'(부분)을 의미하며, 공간을 나누는 데 사용하는 유연한 단위입니다.
-  */
   grid-template-columns: 1fr 1fr;
+  width: 100%;
+
+  &.mobile{
+    grid-template-columns: 1fr;
+  }
 }
+
+.mobile-toggle {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+
+  button {
+    flex: 1 1 0;
+    min-height: 44px;
+    border: 1px solid var(--border, #ddd);
+    border-radius: 0.75rem;
+    background: var(--btn-bg, #f8f8f8);
+    font-size: 1rem;
+  }
+
+  .active {
+    border-color: var(--primary, #0a84ff);
+    background: color-mix(in srgb, var(--primary, #0a84ff) 12%, #fff);
+  }
+}
+

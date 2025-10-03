@@ -3,10 +3,13 @@ import { SelectOptions, DisplayLocationOption } from '../select-options/select-o
 import { StationBoard } from '../station-board/station-board';
 import { ApiService } from '@app/core/api.service';
 import { LocationOption, LocationDetail, LocationDetailMap } from '@app/models/data.model';
-import { BehaviorSubject, catchError, combineLatest, map, Observable, of, startWith, Subject, switchMap, tap, timer } from 'rxjs';
+import { BehaviorSubject, catchError, combineLatest, map, Observable, of, shareReplay, startWith, Subject, switchMap, tap, timer } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { FavoritesService } from '@app/core/favorites.service';
+import { BreakpointObserver } from '@angular/cdk/layout';
+
+type Pane = 'options' | 'board'
 
 @Component({
   selector: 'app-home',
@@ -15,6 +18,21 @@ import { FavoritesService } from '@app/core/favorites.service';
   styleUrl: './home.scss'
 })
 export class Home implements OnInit{
+
+  // For Mobile view
+  readonly isMobile$: Observable<boolean>;
+  active: Pane = 'options';
+
+  constructor(private bo: BreakpointObserver) {
+    this.isMobile$ = this.bo.observe('(max-width: 768px)')
+      .pipe(
+        map(res => res.matches),
+        shareReplay({bufferSize: 1, refCount:true})
+      )
+  }
+
+  show(pane:Pane) {this.active= pane;}
+
   apiService = inject(ApiService);
   favService = inject(FavoritesService);
 

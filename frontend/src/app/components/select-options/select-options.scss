@@ -81,8 +81,8 @@
 }
 
 .icon-search-button svg {
-  width: 0.6rem;
-  height: 0.6rem;
+  width: 1.5rem;
+  height: 1.5rem;
   fill: #fff;
 }
 
@@ -98,6 +98,7 @@
 
 .result-item:hover {
   background-color: #f5f5f5;
+  font-weight: bold;
 }
 
 .result-item.favorite-item {

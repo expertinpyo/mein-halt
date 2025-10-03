@@ -67,6 +67,12 @@ export class SelectOptions implements OnInit, OnDestroy{
     event.stopPropagation();
     this.toggleFavorite.emit(location);
   }
+
+  isSearchPossible(): boolean {
+    if(this.searchControl.value?.trim() && this.selectedItem)
+      return true;
+    return false
+  }
   
   ngOnDestroy(): void {
     this.destory$.next();

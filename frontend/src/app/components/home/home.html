@@ -1,11 +1,14 @@
-<div class="home-flex">
-  <app-select-options
+<div class="home-flex" [class.mobile]="(isMobile$ | async) === true">
+  @if(!(isMobile$ | async) || active === 'options') {
+    <app-select-options
     [locationOptionsDisply]="locationOptionsDisplay$ | async"
     (locationOptionsSearch)="onSearchLocationOptions($event)"
     (detailSearch)="onSearchDetail($event)"
     (toggleFavorite)="onFavToggleClicked($event)"
     >
   </app-select-options>
+  }
+  
   <app-station-board
     [stationDetails]="locationDetail$ | async"
     (autoSearchToggle)="onAutoSearchToggle($event)"

@@ -67,7 +67,7 @@ header {
 
 
 .toggle-switch .toggle-label {
-  font-size: 0.5rem;
+  font-size: 0.8rem;
   color: var(--color-text);
 }
 
@@ -116,7 +116,10 @@ header {
 .remaining-time {
   flex: 1;
   text-align: center;
+  gap: .5rem;           
+
 }
+
 
 .remaining-time > span.time {
   display: inline-block;
@@ -127,6 +130,7 @@ header {
   color: #495057;
   font-size: 0.85rem;
   font-weight: 600;
+  white-space: wrap;
   transition: all 0.2s ease-in-out;
 }
 

@@ -45,25 +45,28 @@
               </div>
               <div class="estimated-time">
                 <span>Echt</span>
+                
                 <div [ngClass]="isDelayed(detail.locationDetails[0])" class="time-organize">
                   <span>{{detail.locationDetails[0].etTime | date:'yyyy-MM-dd'}}</span>
                   <span>{{detail.locationDetails[0].etTime | date:'HH:mm:ss'}}</span>
                 </div>
               </div>
               <div class="remaining-time">
-                <span>Dieses Fahrzeug</span>
+                <span class="time-label">Dieses</span>
                 <span class="time" [ngClass]="getRemainingTimeClass(detail.locationDetails[0].etTime, now)">
                   {{detail.locationDetails[0].etTime | remainingTime:now }}
                 </span>
               </div>
               
               <div class="remaining-time">
-                <span>Nächstes Fahrzeug</span>
-                @if(detail.locationDetails.length > 1) {
-                <span class="time">{{ detail.locationDetails[1].etTime | remainingTime:now}}</span>
-                } @else{
-                  <span class="time">-</span>
-                }
+                <span class="time-label">Nächstes</span>
+                <span class="time">
+                  @if(detail.locationDetails.length > 1) {
+                    {{ detail.locationDetails[1].etTime | remainingTime:now}}
+                  } @else{
+                          -
+                  }
+                </span>
               </div>
             </div>
           </li>

@@ -12,11 +12,11 @@ export class RemainingTimePipe implements PipeTransform {
     const diffInMinutes = Math.floor(diffInMs/60000);
 
     if (diffInMinutes <  0) {
-      return 'Angekommen';
+      return 'Ankunft';
     }
 
     if (diffInMinutes <= 1) {
-      return 'Ankunft in Kürze';
+      return 'Kommt gleich';
     }
     
     return `In ${diffInMinutes} Minuten`;
